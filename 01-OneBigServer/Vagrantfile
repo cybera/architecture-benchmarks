@@ -1,0 +1,36 @@
+require 'vagrant-openstack-plugin'
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "dummy"
+  ssh_key = "mcjones_DAIR.pem"
+  keypair = "mcjones_DAIR"
+  image = 'Ubuntu 14.04'
+
+  config.ssh.private_key_path = "~/.ssh/#{ssh_key}"
+
+  # Basic OpenStack options
+  # Note that an openrc file needs sourced before using
+  config.vm.provider :openstack do |os|
+    os.username        = ENV['OS_USERNAME']
+    os.api_key         = ENV['OS_PASSWORD']
+    os.tenant          = ENV['OS_TENANT_NAME']
+    os.region          = ENV['OS_REGION_NAME']
+    os.flavor          = /m1.tiny/
+    os.image           = image
+    os.endpoint        = "#{ENV['OS_AUTH_URL']}/tokens"
+    os.keypair_name    = keypair
+    os.ssh_username    = "ubuntu"
+    os.security_groups = ['benchmark-test']
+    os.networks        = []
+    os.floating_ip_pool = 'nova'
+    os.disks           = []
+  end
+
+  config.vm.define 'onebigserver.cybera.ca' do |vm|
+    vm.vm.provision 'shell', path: '../bootstraps/common.sh'
+    vm.vm.provision 'shell', path: '../bootstraps/bigserver.sh'
+    vm.vm.provider :openstack do |os|
+      os.floating_ip = '208.75.74.116'
+    end
+  end
+end

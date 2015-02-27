@@ -1,0 +1,11 @@
+Seige Commands to try:
+
+Siege - just hit as fast as you can with a ton of traffic -30 connections
+
+    siege -t1m -b -c 30 http://10.0.59.4/wordpress
+
+Siege - mimic real life traffic - 30 users (not connections)
+
+    siege -t2m -b -d 30 -c 30 http://10.0.59.4/wordpress
+
+
